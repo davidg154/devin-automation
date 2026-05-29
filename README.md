@@ -53,7 +53,7 @@ Edit `.env` and fill in your values:
 ```env
 DEVIN_API_KEY=your_devin_api_key
 GITHUB_TOKEN=your_github_pat
-GITHUB_REPO=davidg154/superset
+GITHUB_REPO=your-username/superset
 WEBHOOK_SECRET=any_random_string
 ```
 
@@ -75,7 +75,7 @@ curl http://localhost:8000/health
 This creates three pre-built issues in your Superset fork (bug fix, code quality, dependency upgrade):
 
 ```bash
-docker exec devin-automation-1-automation-1 python scripts/create_issues.py
+docker compose exec automation python scripts/create_issues.py
 ```
 
 ---
@@ -86,10 +86,10 @@ The easiest way to trigger the automation is the simulate script — no public U
 
 ```bash
 # Trigger all 3 issues at once
-docker exec devin-automation-1-automation-1 python scripts/simulate_webhook.py
+docker compose exec automation python scripts/simulate_webhook.py
 
 # Trigger a single issue by number
-docker exec devin-automation-1-automation-1 python scripts/simulate_webhook.py 2
+docker compose exec automation python scripts/simulate_webhook.py 2
 ```
 
 This fires a signed `issues.labeled` webhook payload directly at the local server, which creates a Devin session for each issue. Watch progress on the dashboard:
