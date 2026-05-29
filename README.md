@@ -53,7 +53,7 @@ Edit `.env` and fill in your values:
 ```env
 DEVIN_API_KEY=your_devin_api_key
 GITHUB_TOKEN=your_github_pat
-GITHUB_REPO=your-username/superset
+GITHUB_REPO=davidg154/superset
 WEBHOOK_SECRET=any_random_string
 ```
 
