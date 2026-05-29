@@ -37,7 +37,9 @@ async def _check_session(session: dict) -> None:
     devin_status = data.get("status", "running")
     logger.debug("Session %s → devin status: %s", sid, devin_status)
 
-    if devin_status == "stopped":
+    finished = devin_status in ("stopped", "suspended") or data.get("status_enum") == "finished"
+
+    if finished:
         pr_url = _extract_pr_url(data)
         new_status = "completed" if pr_url else "failed"
         await update_session(sid, new_status, pr_url)
@@ -51,10 +53,18 @@ async def _check_session(session: dict) -> None:
 
 
 def _extract_pr_url(data: dict) -> Optional[str]:
+    # Devin returns PR under pull_request.url
+    if pr := data.get("pull_request"):
+        if url := pr.get("url"):
+            return url
     for field in ("pull_request_url", "pr_url"):
         if url := data.get(field):
             return url
-    # Fall back to scanning the session title/summary for a GitHub PR URL
+    # Scan messages and text fields for a GitHub PR URL
+    for msg in data.get("messages", []):
+        match = re.search(r"https://github\.com/\S+/pull/\d+", msg.get("message", ""))
+        if match:
+            return match.group(0)
     for field in ("title", "summary", "structured_output"):
         text = str(data.get(field, ""))
         match = re.search(r"https://github\.com/\S+/pull/\d+", text)
